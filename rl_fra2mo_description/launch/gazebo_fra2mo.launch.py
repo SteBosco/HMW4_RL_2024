@@ -57,10 +57,8 @@ def generate_launch_description():
             launch_arguments={'gz_args': LaunchConfiguration('gz_args')}.items()
     )
 
-    #position = [0.0, 0.0, 0.100]
-    #1a
     position = [-3.0, 3.5, 0.100]
-    orientation = [0.0, 0.0, 0.0]
+    orientation = [0.0, 0.0, -1.57]
 
 
     # Define a Node to spawn the robot in the Gazebo simulation
@@ -142,6 +140,6 @@ def generate_launch_description():
  
     ign = [gazebo_ignition, gz_spawn_entity]
     nodes_to_start = [robot_state_publisher_node, joint_state_publisher_node, *ign, bridge, 
-                      odom_tf, laser_id_link_tf, ign_clock_bridge, bridge_camera ]
+                      odom_tf, laser_id_link_tf, ign_clock_bridge, bridge_camera]
 
     return LaunchDescription([SetEnvironmentVariable(name="GZ_SIM_RESOURCE_PATH", value = models_path + ':' + os.environ.get('GZ_SIM_RESOURCE_PATH', ''))] + declared_arguments + nodes_to_start)

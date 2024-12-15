@@ -25,11 +25,6 @@ behavior_server:
     max_rotational_vel: 1.0
     min_rotational_vel: 0.4
     rotational_acc_lim: 3.2
-    set_initial_pose: True
-    initial_pose:
-      x: -3.0
-      y: 3.5
-      yaw: -1.57
 
 bt_navigator:
   ros__parameters:
@@ -147,7 +142,6 @@ explore_node:
     gain_scale: 1.0
     transform_tolerance: 0.1
     min_frontier_size: 0.6
-
 
 local_costmap:
   local_costmap:
