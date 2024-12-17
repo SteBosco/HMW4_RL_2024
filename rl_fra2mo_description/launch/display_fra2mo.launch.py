@@ -16,9 +16,6 @@ from launch.actions import (
 
 def generate_launch_description():
 
-
-
-
     declared_arguments = [] 
  
     declared_arguments.append(
@@ -34,10 +31,10 @@ def generate_launch_description():
     # Percorsi ai file
     xacro_file_name = "fra2mo.urdf.xacro"
   #  rviz_config_file = os.path.join(FindPackageShare("rl_fra2mo_description"), "rviz_conf", "explore.rviz")
-    xacro = os.path.join(get_package_share_directory('rl_fra2mo_description'), "urdf", xacro_file_name)
+    xacro = os.path.join(get_package_share_directory("rl_fra2mo_description"), "urdf", xacro_file_name)
     
     # Configurazione per l'uso del tempo di simulazione
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     # Genera la descrizione del robot usando xacro
     robot_description_xacro = {"robot_description": ParameterValue(Command(['xacro ', xacro]),value_type=str)}
     
@@ -47,14 +44,15 @@ def generate_launch_description():
         executable='robot_state_publisher',
         parameters=[robot_description_xacro,
                     {"use_sim_time": True}
-            ]
+            ],
+        remappings=[('/robot_description', '/robot_description')]
     )
     
     # Nodo joint_state_publisher
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-    )
+    # joint_state_publisher_node = Node(
+    #     package='joint_state_publisher_gui',
+    #     executable='joint_state_publisher_gui',
+    # )
 
     # Nodo RViz2
     rviz_node = Node(
@@ -67,6 +65,6 @@ def generate_launch_description():
     )
 
     # nodes_to_start = [robot_state_publisher_node, joint_state_publisher_node, rviz_node]
-    nodes_to_start = [robot_state_publisher_node, joint_state_publisher_node, rviz_node]
+    nodes_to_start = [robot_state_publisher_node, rviz_node]
 
     return LaunchDescription(declared_arguments + nodes_to_start)
