@@ -34,7 +34,7 @@ def generate_launch_description():
     xacro = os.path.join(get_package_share_directory("rl_fra2mo_description"), "urdf", xacro_file_name)
     
     # Configurazione per l'uso del tempo di simulazione
-    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
     # Genera la descrizione del robot usando xacro
     robot_description_xacro = {"robot_description": ParameterValue(Command(['xacro ', xacro]),value_type=str)}
     

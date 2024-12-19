@@ -122,7 +122,7 @@ class ArucoNavigationNode(Node):
         # Creazione e pubblicazione della trasformazione statica
         transform_stamped = TransformStamped()
         transform_stamped.header.stamp = self.get_clock().now().to_msg()
-        transform_stamped.header.frame_id = 'camera'
+        transform_stamped.header.frame_id = 'aruco_marker_frame'
         transform_stamped.child_frame_id = 'map'
 
         transform_stamped.transform.translation.x = map_x
@@ -140,30 +140,45 @@ class ArucoNavigationNode(Node):
 
         # Log per debug
         self.get_logger().debug(
-            f"Published static transform: [frame: camera -> map] "
+            f"Published static transform: [frame: aruco_marker_frame -> map] "
             f"[x: {map_x:.2f}, y: {map_y:.2f}, z: {map_z:.2f}]"
         )
 
 
     def return_to_initial_position(self):
-        # Recupera la posizione iniziale dal file YAML
-        initial_position = initial_pose["initial_pose"]
-        initial_goal = PoseStamped()
-        initial_goal.pose.position.x = initial_position['position']['x']
-        initial_goal.pose.position.y = initial_position['position']['y']
-        initial_goal.pose.position.z = initial_position['position']['z']
-        initial_goal.pose.orientation.x = initial_position['orientation']['x']
-        initial_goal.pose.orientation.y = initial_position['orientation']['y']
-        initial_goal.pose.orientation.z = initial_position['orientation']['z']
-        initial_goal.pose.orientation.w = initial_position['orientation']['w']
+                
+        # Recupera la posa iniziale dal file YAML
 
-        # Naviga verso la posizione iniziale
-        self.navigator.goToPose(initial_goal)
+        initial_position = initial_pose.get("initial_pose", None)
+        if not initial_position:
 
+            self.get_logger().error("Initial pose not defined in initial_pose.yaml.")
+            return# Crea una singola posa di destinazione
+
+        goal_pose = self.create_pose(initial_position)
+        
+            # Naviga verso la posa iniziale
+
+        self.navigator.goToPose(goal_pose)
+        
+            # Attendi il completamento della navigazione
         while not self.navigator.isTaskComplete():
+
             feedback = self.navigator.getFeedback()
             if feedback:
-                print(f"Returning to initial position: waypoint {feedback.current_waypoint + 1}")
+                print(f"Returning to initial position: Distance remaining: {feedback.distance_remaining:.2f} meters.")
+            
+                # Verifica il risultato della navigazione
+
+        result = self.navigator.getResult()
+        if result == TaskResult.SUCCEEDED:
+
+                self.get_logger().info("Successfully returned to the initial position.")
+        else:
+
+                self.get_logger().error("Failed to return to the initial position.")
+        
+
 
     def create_pose(self, transform):
         initial_translation = {"x": -3, "y": 3.5}
@@ -207,7 +222,7 @@ class ArucoNavigationNode(Node):
         pose.pose.orientation.w = odom_orientation["w"]
 
         return pose
-
+    
 
 def main():
     rclpy.init()
