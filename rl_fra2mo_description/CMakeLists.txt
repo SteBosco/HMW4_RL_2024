@@ -21,18 +21,20 @@ find_package(tf2_ros REQUIRED)
 add_executable(dynamic_tf_publisher src/odom_bl_tf.cpp)
 ament_target_dependencies(dynamic_tf_publisher rclcpp nav_msgs geometry_msgs tf2 tf2_ros)
 
+add_executable(aruco_tf_publisher src/aruco_tf_broadcaster.cpp)
+ament_target_dependencies(aruco_tf_publisher rclcpp nav_msgs geometry_msgs tf2 tf2_ros)
+
 # Installa i file necessari
 install(DIRECTORY launch urdf models meshes worlds config src maps scripts
   DESTINATION share/${PROJECT_NAME}
 )
-install(TARGETS dynamic_tf_publisher
+install(TARGETS dynamic_tf_publisher aruco_tf_publisher
   DESTINATION lib/${PROJECT_NAME}
 )
 # Install Python executables
 install(PROGRAMS
   scripts/reach_goal.py
   scripts/follow_waypoints.py
-  scripts/aruco_waypoint.py
   scripts/vision_based_navigation.py
   DESTINATION lib/${PROJECT_NAME}
 )
