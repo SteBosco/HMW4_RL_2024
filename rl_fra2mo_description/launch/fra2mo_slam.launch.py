@@ -63,7 +63,7 @@ def generate_launch_description():
     slam_params_file_arg = DeclareLaunchArgument(
         'slam_params_file',
         default_value=PathJoinSubstitution(
-            [fra2mo_share_dir, 'config', 'slam_low.yaml']
+            [fra2mo_share_dir, 'config', 'slam.yaml']
         ),
         description='Full path to the ROS2 parameters file to use for the slam_toolbox node',
     )
@@ -71,7 +71,7 @@ def generate_launch_description():
     slam_params_file_arg_medium = DeclareLaunchArgument(
         'slam_params_file',
         default_value=PathJoinSubstitution(
-            [fra2mo_share_dir, 'config', 'slam_medium.yaml']
+            [fra2mo_share_dir, 'config', 'slam_medium_values.yaml']
         ),
         description='Full path to the ROS2 parameters file to use for the slam_toolbox node',
     )
@@ -79,7 +79,7 @@ def generate_launch_description():
     slam_params_file_arg_high = DeclareLaunchArgument(
         'slam_params_file',
         default_value=PathJoinSubstitution(
-            [fra2mo_share_dir, 'config', 'slam_high.yaml']
+            [fra2mo_share_dir, 'config', 'slam_high_values.yaml']
         ),
         description='Full path to the ROS2 parameters file to use for the slam_toolbox node',
     )
@@ -115,4 +115,3 @@ def generate_launch_description():
         use_sim_time_arg,
         slam_node,
     ])
-

@@ -1,77 +1,82 @@
-# ros2_vision
+Homework3_rl2024
+Homework 3 for Robotics Lab 2024/2025
 
-## :package: About
+First build all the packages by using:
 
-This package contains the tutorial code to create and run your C++ vision node using [usb_cam](https://github.com/ros-drivers/usb_cam), [camera_calibration](https://github.com/ros-perception/image_pipeline/tree/rolling/camera_calibration), [open_cv](https://github.com/ros-perception/vision_opencv), and [aruco_ros](https://github.com/pal-robotics/aruco_ros).
+colcon build --packages-select aruco aruco_msgs aruco_ros rl_fra2mo_description ros2_opencv
+In each terminal you open, source the install directory:
 
-## :pencil: Before you start
-Make sure to install the following packages with
+source install/setup.bash
+1. Launch the Gazebo simulation and spawn the mobile robot in the world leonardo_race_field
+Run the following command:
+```
+ros2 launch rl_fra2mo_description gazebo_fra2mo.launch.py
+```
+NOTE: to visualize the view of the camera we placed, run:
+```
+ros2 run rqt_image_view rqt_image_view
+```
+and select the /videocamera topic
 
-```
-$ sudo apt-get install ros-humble-usb-cam -y
-```
-```
-$ sudo apt-get install ros-humble-image-pipeline -y
-```
-```
-$ sudo apt-get install ros-humble-tf-transformations -y
-```
 
-To use the *usb_cam* package it is recommended to copy the default params file from the *usb_cam* default installation directory into your ROS2 workspace by
+2. Autonomous navigation task
+In the first terminal run:
 ```
-$ sudo cp /opt/ros/humble/share/usb_cam/config/params_1.yaml ~/ros2_ws/src/ros2_vision/config/camera_params.yaml 
+ros2 launch rl_fra2mo_description rviz_gazebo.launch.py
 ```
-To use the copied params file, you can use the command
+In another terminal launch:
 ```
-$ ros2 run usb_cam usb_cam_node_exe --ros-args --params-file src/ros2_vision/config/camera_params.yaml 
+ros2 launch rl_fra2mo_description fra2mo_explore.launch.py
 ```
-NOTE: if you run into permission issues, remember to
+In the last terminal run:
 ```
-$ sudo chown root:user /dev/video0 
+ros2 run rl_fra2mo_description follow_waypoints.py 
 ```
+4a-4b. 2D navigation task
+In the first terminal run:
+```
+ros2 launch rl_fra2mo_description rviz_gazebo.launch.py
+```
+In another terminal launch:
 
-At this point, you should be able to see the */image_raw* topic streamed by your device. To perform the calibration of your camera you must run the following node (more detailed instructions [here](https://docs.ros.org/en/rolling/p/camera_calibration/))
+ros2 launch rl_fra2mo_description nav_aruco.launch.py
+In another terminal run:
 ```
-$ ros2 run camera_calibration cameracalibrator --size 9x6 --square 0.015 --ros-args -r image:=/image_raw 
-```
-After calibration, it is recommended to copy the dataset into your preferred location, e.g.
-```
-mv /tmp/calibrationdata.tar.gz ~/ros2_ws/src/calibrationdata.tar.gz 
-```
-Unzip the *calibrationdata.tar.gz* file and copy the results of your calibration procedure
-```
-sudo cp /calibrationdata/ost.yaml /opt/ros/humble/share/usb_cam/config/my_camera_info.yaml 
-```
-Remember to modify the */ros2_vision/config/camera_params.yaml* file, to use the new file *my_camera_info.yaml*.
-
-To rectify the image streamed by your camera using the results of your calibration you must run
-```
-$ ros2 run usb_cam usb_cam_node_exe --ros-args --params-file src/camera_params.yaml --remap image_raw:=image 
-```
-```
-$ ros2 run image_proc rectify_node  
-```
-You should be able to see the */image_rect* topic.
-
-## :hammer: Build
-Clone this package in the `src` folder of your ROS 2 workspace. Check for missing dependencies
-```
-$ rosdep install -i --from-path src --rosdistro humble -y
-```
-Build your new package
-```
-$ colcon build --symlink-install
-```
-Source the setup files
-```
-$ . install/setup.bash
+ros2 run rl_fra2mo_description vision_based_navigation.py
 ```
 
-## :white_check_mark: Usage
-Run the aruco_ros node
+In another terminal, to check whether the robot is actually detecting the marker, run:
 ```
-$ ros2 run usb_cam usb_cam_node_exe --ros-args -r /image_raw:=/stereo/left/image_rect_color -r /camera_info:=/stereo/left/camera_info
+ros2 run rqt_image_view rqt_image_view 
 ```
+and select as topic: aruco_single/result.
+# 4c.  Publish the Aruco pose as TF
+In the first terminal run:
 ```
-$ ros2 launch aruco_ros single.launch.py marker_size:=0.1 marker_id:=201
+ros2 launch rl_fra2mo_description rviz_gazebo.launch.py
 ```
+In second terminal, run:
+```
+ros2 launch rl_fra2mo_description nav_aruco.launch.py
+```
+To move the mobile robot close to obstacle 9 so that it can see the Aruco Marker with the camera, run:
+```
+ros2 run rl_fra2mo_description go_to_aruco.py
+```
+In another terminal, to check whether the robot is actually detecting the marker, run:
+```
+ros2 run rqt_image_view rqt_image_view
+```
+and select as topic: aruco_single/result.
+ 
+In another terminal run:
+```
+ros2 run rl_fra2mo_description aruco_to_map
+```
+In the last terminal, to see the transformation published by the node, run:
+```
+ros2 topic echo /tf
+```
+ 
+NOTES:
+After running the command provided above, as soon as Gazebo opens, PRESS THE PLAY BUTTON in the lower left corner!!!
